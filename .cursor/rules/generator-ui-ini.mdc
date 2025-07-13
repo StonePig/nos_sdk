@@ -1,0 +1,466 @@
+# UI配置文件生成规则 (generator-ui-ini.mdc)
+
+## 概述
+本文档定义了 `ui.ini` 配置文件的格式规则，用于生成MCU仿真平台的用户界面配置。
+
+### 组件选择原则
+- **可选组件**：所有组件都可选，根据项目的实际需求选择配置
+- **按需配置**：不需要的功能组件可以不配置，避免冗余
+- **灵活组合**：可以根据项目特点灵活组合不同的组件
+- **显示声明**：所有功能组件和控件组件都必须在 `[GROUP]` 段中声明才能显示
+
+## 文件结构
+
+### 1. 窗口配置段
+
+#### [WINDOW] 段 - 窗口配置（可选）
+```ini
+[WINDOW]
+MAX_ENABLE=1         // 是否允许最大化窗口，1：允许，默认1
+FONT_SIZE=70         // 默认字体大小，控件未定义时使用此值
+FONT_COLOR=0x000000  // 默认字体颜色，控件未定义时使用此值
+FONT_NAME=微软雅黑   // 默认字体名称，控件未定义时使用此值
+```
+- 用于配置主窗口的显示属性。
+- `MAX_ENABLE`：是否允许最大化窗口，1为允许，0为不允许，默认1。
+- `FONT_SIZE`：默认字体大小，当控件未定义 CONTROL_FONT_SIZE 时使用此值，默认70。
+- `FONT_COLOR`：默认字体颜色，当控件未定义 CONTROL_FONT_COLOR 时使用此值，默认黑色(0x000000)。
+- `FONT_NAME`：默认字体名称，当控件未定义 CONTROL_FONT_NAME 时使用此值，默认微软雅黑。
+- 可根据项目需求扩展其他窗口相关参数。
+- **注意**：此段为可选段，未配置时使用系统默认值。
+
+#### [REMINDER] 段 - 提示信息配置（可选）
+```ini
+[REMINDER]
+DISPLAY_MODE=DIALOG     // 显示模式 (DIALOG:对话框模式, 空值或未配置:固定位置模式)
+FIXED_POS={820,150}     // 固定位置(x/y坐标) (仅在非对话框模式下有效)
+WIDTH=380               // 控件宽度 (仅在非对话框模式下有效)
+HEIGHT=60               // 控件高度 (仅在非对话框模式下有效)
+FONT_NAME={黑体}        // 字体名称 (仅在非对话框模式下有效)
+FONT_SIZE={180}         // 字体大小 (仅在非对话框模式下有效)
+```
+- `DISPLAY_MODE`：显示模式设置
+  - `DIALOG`：以对话框形式显示提示信息，点击确定后关闭
+  - 空值或未配置：以固定位置静态文本形式显示提示信息
+- `FIXED_POS`：固定位置坐标，格式为{x,y}，仅在非对话框模式下有效
+- `WIDTH`：控件宽度，仅在非对话框模式下有效
+- `HEIGHT`：控件高度，仅在非对话框模式下有效
+- `FONT_NAME`：字体名称，仅在非对话框模式下有效
+- `FONT_SIZE`：字体大小，仅在非对话框模式下有效
+- **注意**：对话框模式下，提示信息会根据颜色自动选择图标类型（红色为错误，蓝色为信息，黄色为警告）
+
+### 2. 组件定义段
+
+#### [GROUP] 段 - 组件定义
+```ini
+[GROUP]
+GROUP={LCD,UART,CAN,GROUP_1,GROUP_2,GROUP_3,GROUP_4,GROUP_5,GROUP_6,...}
+```
+- 定义所有UI组件的显示顺序
+- 组件名称用逗号分隔，用大括号包围
+- **重要**：所有功能组件和控件组件都必须在此处声明才能显示
+- 未在GROUP中声明的组件将不会显示在界面上
+
+##### GROUP声明规则
+- **功能组件**：`LCD`, `UART`, `CAN`, `LED`, `KEY`, `DI`, `DO`, `PWM`, `ADC`, `ENCODER` 等
+- **控件组件**：`GROUP_` 开头的自定义控件组件
+- **显示顺序**：组件在GROUP中的顺序决定了界面上的显示顺序
+- **必需性**：即使只配置一个功能组件，也必须在此处声明
+
+### 3. 硬件仿真组件段（可选）
+
+**注意**：硬件仿真组件段通常使用系统默认的字体样式，不包含字体大小和颜色属性，以保持界面的一致性。
+
+#### [UART] 段 - 串口通信配置
+```ini
+[UART]
+DISP_NAME={通讯配置}      // 显示名称
+NEXT_GROUP_POS=2         // 下一个组件位置 (0:下方, 1:右边, 2:最左边)
+BAUD={9600}             // 波特率列表
+WIDTH=200               // 组件宽度
+HEIGHT=280              // 组件高度
+SHOW_HEX=1              // 显示十六进制 (0/1)
+```
+
+#### [CAN] 段 - CAN通信配置
+```ini
+[CAN]
+DISP_NAME={CAN配置}      // 显示名称
+NEXT_GROUP_POS=2         // 下一个组件位置 (0:下方, 1:右边, 2:最左边)
+WIDTH=300               // 组件宽度
+HEIGHT=230              // 组件高度
+```
+
+#### [LCD] 段 - LCD显示配置
+```ini
+[LCD]
+HIDDEN=0                // 隐藏状态 (0/1)
+WIDTH=800               // LCD宽度
+HEIGHT=300              // LCD高度
+DEPTH=16                // 颜色深度
+WIDTH_ZOOM=100          // 宽度缩放比例
+HEIGHT_ZOOM=100         // 高度缩放比例
+```
+
+#### [LED] 段 - LED显示配置
+```ini
+[LED]
+HIDDEN=0                // 隐藏状态
+DIGIT_WIDTH=60          // 数字宽度
+DIGIT_HEIGHT=100        // 数字高度
+RECT_WIDTH=40           // 矩形宽度
+RECT_HEIGHT=10          // 矩形高度
+DIGIT_COLOR=0x00        // 数字颜色
+RECT_COLOR=0xFF         // 矩形颜色
+```
+
+#### [KEY] 段 - 按键配置
+```ini
+[KEY]
+DISP_NAME=key           // 显示名称
+WIDTH=100               // 宽度
+CONTROL_HEIGHT={40}        // 控件高度
+CONTROL_NAME={MENU,BACK,OK,UP,DOWN}  // 按键名称
+COMBINE_KEY_SIMU=0      // 组合键仿真开关
+```
+
+#### [DI/DO] 段 - 数字输入/输出配置
+```ini
+[DI/DO]
+DISP_NAME=input/output  // 显示名称
+WIDTH=100               // 宽度
+CONTROL_HEIGHT={40}        // 控件高度
+CONTROL_NAME={DI0,DI1,DI2} // 控件名称
+CONTROL_DEFAULT_VALUE={1,0,0}  // 默认值
+CHART_SAMPLE_RATE=10    // 图表采样率 (可选)
+```
+
+#### [PWM] 段 - PWM配置
+```ini
+[PWM]
+DISP_NAME=pwm           // 显示名称
+WIDTH=120               // 宽度
+CONTROL_HEIGHT={40}        // 控件高度
+CONTROL_NAME={PWM0,PWM1,PWM2}  // PWM通道名称
+CONTROL_DEFAULT_VALUE={0,0,0}  // 默认值
+```
+
+#### [ADC] 段 - ADC配置
+```ini
+[ADC]
+DISP_NAME=adc           // 显示名称
+WIDTH=200               // 宽度
+CONTROL_HEIGHT={40}        // 控件高度
+CONTROL_NAME={ADC0,ADC1,ADC2}  // ADC通道名称
+CONTROL_DEFAULT_VALUE={100,200,300}  // 默认值
+ADC_RANGE={4095,1023,4095}  // ADC量程
+```
+
+#### [ENCODER] 段 - 编码器配置
+```ini
+[ENCODER]
+DISP_NAME=encode        // 显示名称
+WIDTH=150               // 宽度
+CONTROL_HEIGHT={40}        // 控件高度
+CONTROL_NAME={ENCODER0,ENCODER1}  // 编码器名称
+CONTROL_DEFAULT_VALUE={0,0}  // 默认值
+ENCODER_RANGE={4000,4000}  // 编码器量程
+```
+
+
+### 4. 控件组件段 (GROUP_*)（可选）
+
+#### 基本结构
+```ini
+[GROUP_组名]
+DISP_NAME=显示名称       // 组件显示名称
+WIDTH=300               // 组件宽度
+NEXT_GROUP_POS=0        // 下一个组件位置 (0:下方, 1:右边, 2:最左边) (可选，默认1)
+FIXED_POS={810,90}      // 固定位置(x/y坐标) (可选, 当存在NEXT_GROUP_POS时无效)
+MAX_ITEMS_PER_COLUMN=10 // 每列最大控件数 (可选)
+CONTROL_NAME={控件1,控件2,控件3}  // 控件名称列表
+CONTROL_TYPE={SLIDER,EDIT,CHECK,BUTTON,CHART,FILE,COMBO,EDIT_BOTTON,STATIC}  // 控件类型
+CONTROL_DATA_TYPE={0,1}    // 数据类型 (0:数值, 1:字符串) (可选, 默认0)
+CONTROL_NAME_WIDTH={200}   // 控件名称宽度
+CONTROL_HEIGHT={50}        // 控件高度
+CONTROL_DEFAULT_VALUE={0,1,2}  // 默认值列表 (可选, 默认0)
+CONTROL_FONT_SIZE={70}     // 控件字体大小 (可选, 未定义时使用[WINDOW]段FONT_SIZE)
+CONTROL_FONT_COLOR={0x000000}  // 控件字体颜色 (可选, 未定义时使用[WINDOW]段FONT_COLOR)
+CONTROL_FONT_NAME={微软雅黑}  // 控件字体名称 (可选, 未定义时使用[WINDOW]段FONT_NAME)
+```
+
+#### 控件类型详解
+
+##### SLIDER - 滑块控件
+```ini
+CONTROL_TYPE={SLIDER}      // 滑块控件类型
+SLIDER_MIN={0}          // 最小值
+SLIDER_MAX={1023}       // 最大值
+```
+
+##### EDIT - 编辑框控件
+```ini
+CONTROL_TYPE={EDIT}        // 编辑框控件类型
+```
+
+##### CHECK - 复选框控件
+```ini
+CONTROL_TYPE={CHECK}       // 复选框控件类型
+```
+
+##### BUTTON - 按钮控件
+```ini
+CONTROL_TYPE={BUTTON}      // 按钮类型
+```
+
+##### CHART - 图表控件
+```ini
+CONTROL_TYPE={CHART}       // 图表类型
+CHART_SAMPLE_RATE=200   // 刷新率，单位ms
+CHART_SERIES_NAME0={系列1,系列2}  // 数据系列名称
+CHART_SERIES_COLOR0={0x0000FF,0xFF0000}  // 数据系列颜色
+```
+
+##### COMBO - 下拉框控件
+```ini
+CONTROL_TYPE={COMBO}       // 下拉框类型
+COMBO_LISTx={选项1,选项2}  // 下拉选项列表 (x表示下拉框在控件列表中的位置)
+```
+
+##### FILE - 文件控件
+```ini
+CONTROL_TYPE={FILE}        // 文件类型
+FILE_EXT={bin,txt,ini}  // 文件扩展名列表
+FILE_MODE={READ,WRITE}  // 文件操作模式
+```
+
+##### EDIT_BUTTON - 编辑按钮控件
+```ini
+CONTROL_TYPE={EDIT_BUTTON} // 编辑按钮类型
+```
+
+##### STATIC - 静态文本控件
+```ini
+CONTROL_TYPE={STATIC}      // 静态文本类型
+STATIC_CHART={1}        // 静态图表开关 (1：打开，0：关闭，默认关闭。开关打开后，点击控件可切换到图表或文本显示模式)
+```
+
+## 生成规则
+
+### 1. 文件命名
+- 文件名：`ui.ini`
+- 位置：应用目录下
+
+### 2. 段命名规则
+- 窗口配置段：`[WINDOW]`（可选）、`[REMINDER]`（可选）
+- 组件组定义段：`[GROUP]`（可选）
+- 硬件仿真组件段：`[UART]`, `[LCD]`, `[LED]`, `[KEY]`, `[DI]`, `[DO]`, `[PWM]`, `[ADC]`, `[ENCODER]`, `[CAN]`（可选，根据项目需求配置）
+- 控件组件段：`[GROUP_组名]`，组名使用大写字母和下划线（可选，根据项目需求配置）
+
+### 3. 参数格式规则
+- 字符串值：用大括号包围，如 `{值1,值2,值3}`
+- 数值：直接写数字，如 `300`
+- 布尔值：使用 `0` 或 `1`
+- 颜色值：使用十六进制格式，如 `0x0000FF`
+- 字体大小：数值，范围通常为8-72，如 `12`
+- 字体颜色：十六进制格式，如 `0x000000`（黑色）、`0xFF0000`（红色）、`0x00FF00`（绿色）、`0x0000FF`（蓝色）
+- 字体名称：字符串，如 `微软雅黑`、`宋体`、`Arial`、`Times New Roman` 等
+- 注释：使用 `//` 开头
+- 分号注释：使用 `;` 开头
+
+### 4. 数组参数规则
+- 当参数包含多个值时，使用大括号包围
+- 值之间用逗号分隔
+- **数组长度可以与对应的项目数量不一致**（修改后的规则）
+- 当数组长度不足时，后续项目使用默认值或最后一个有效值
+- 当数组长度超过时，多余的值会被忽略
+- **当值为空时，取前面最后一个非空值**
+
+### 5. 位置参数规则
+- `NEXT_GROUP_POS`：
+  - `0`：当前组的下方
+  - `1`：当前组的右边
+  - `2`：屏幕的最左边
+
+### 6. 数据类型规则
+- `CONTROL_DATA_TYPE`：
+  - `0`：数值类型
+  - `1`：字符串类型
+
+## 示例模板
+
+### 最小配置模板（仅必需组件）
+```ini
+; 空配置文件 - 使用系统默认设置
+```
+- 注意：`[WINDOW]` 和 `[GROUP]` 段都为可选，未配置时使用系统默认值
+- 注意：如果配置硬件仿真组件或控件组件，需要在 `[GROUP]` 段中声明才能显示
+
+### 基本模板
+```ini
+[WINDOW]
+MAX_ENABLE=1
+FONT_SIZE=24
+FONT_COLOR=0x000000
+FONT_NAME=微软雅黑
+
+[REMINDER]
+DISPLAY_MODE=DIALOG
+FIXED_POS={820,150}
+WIDTH=380
+HEIGHT=60
+FONT_NAME={黑体}
+FONT_SIZE={180}
+
+[GROUP]
+GROUP={UART,GROUP_1,GROUP_2}
+
+[GROUP_1]
+DISP_NAME=控件组件1
+WIDTH=300
+NEXT_GROUP_POS=0
+CONTROL_NAME={控件1,控件2,控件3}
+CONTROL_TYPE={SLIDER}
+CONTROL_HEIGHT={50}
+CONTROL_DEFAULT_VALUE={0,0,0}
+SLIDER_MIN={0}
+SLIDER_MAX={100}
+
+
+[GROUP_2]
+DISP_NAME=控件组件2
+WIDTH=300
+NEXT_GROUP_POS=1
+CONTROL_NAME={控件1,控件2}
+CONTROL_TYPE={CHECK}
+CONTROL_HEIGHT={33}
+CONTROL_DEFAULT_VALUE={0,0}
+
+
+[UART]
+DISP_NAME={通讯配置}
+WIDTH=200
+HEIGHT=280
+NEXT_GROUP_POS=2
+HIDDEN=1
+SHOW_HEX=1
+
+
+### 复杂模板（包含多种控件）
+```ini
+[WINDOW]
+MAX_ENABLE=1
+FONT_SIZE=24
+FONT_COLOR=0x000000
+FONT_NAME=微软雅黑
+
+[REMINDER]
+DISPLAY_MODE=DIALOG
+FIXED_POS={820,150}
+WIDTH=380
+HEIGHT=60
+FONT_NAME={黑体}
+FONT_SIZE={180}
+
+[GROUP]
+GROUP={LCD,UART,GROUP_1,GROUP_2,GROUP_3,GROUP_4,GROUP_5,GROUP_6,GROUP_7,GROUP_8}
+
+[GROUP_1]
+DISP_NAME=组1
+WIDTH=220
+NEXT_GROUP_POS=0
+MAX_ITEMS_PER_COLUMN=10
+CONTROL_NAME_WIDTH={120}
+CONTROL_HEIGHT={33}
+CONTROL_TYPE={CHECK}
+CONTROL_DATA_TYPE={1}
+CONTROL_NAME={控件1,控件2,控件3}
+
+
+[GROUP_2]
+DISP_NAME=组2
+WIDTH=220
+NEXT_GROUP_POS=0
+MAX_ITEMS_PER_COLUMN=10
+CONTROL_NAME_WIDTH={120}
+CONTROL_HEIGHT={33}
+CONTROL_TYPE={EDIT}
+CONTROL_DATA_TYPE={0}
+CONTROL_NAME={控件1,控件2,控件3}
+
+
+[GROUP_6]
+DISP_NAME=组6
+WIDTH=230
+CONTROL_NAME_WIDTH={100}
+CONTROL_HEIGHT={33}
+CONTROL_TYPE={EDIT,EDIT,EDIT,COMBO,EDIT,EDIT}
+CONTROL_DATA_TYPE={1,0,0,0,0,1}
+CONTROL_NAME={控件1,控件2,控件3,控件4,控件5,控件6}
+COMBO_LIST3={选项1,选项2}
+
+
+[GROUP_7]
+DISP_NAME=组7
+WIDTH=200
+CONTROL_NAME={控件1,控件2,控件3,控件4,控件5,控件6,控件7,控件8,控件9}
+CONTROL_NAME_WIDTH={60}
+CONTROL_HEIGHT={50}
+CONTROL_TYPE={BUTTON,,FILE,BUTTON,,,EDIT_BUTTON,,}
+FILE_EXT={,,bin}
+
+
+[GROUP_8]
+DISP_NAME=组8
+WIDTH=300
+CONTROL_NAME={标题,说明文本,状态信息}
+CONTROL_NAME_WIDTH={80}
+CONTROL_HEIGHT={30}
+CONTROL_TYPE={STATIC,STATIC,STATIC}
+CONTROL_DATA_TYPE={1,1,1}
+CONTROL_DEFAULT_VALUE={系统状态,当前运行正常,在线}
+
+
+[LCD]
+WIDTH=800
+HEIGHT=400
+DEPTH=16
+WIDTH_ZOOM=100
+HEIGHT_ZOOM=100
+
+[UART]
+DISP_NAME={通讯配置}
+WIDTH=200
+HEIGHT=280
+NEXT_GROUP_POS=2
+HIDDEN=1
+SHOW_HEX=1
+
+## 注意事项
+
+1. **可选组件**：`[WINDOW]` 和 `[GROUP]` 段都为可选，其他组件根据项目需求配置
+2. **显示声明**：如果配置了硬件仿真组件或控件组件，必须在 `[GROUP]` 段中声明才能显示
+3. **参数一致性**：数组参数的长度可以与对应的项目数量不一致（修改后的规则）
+4. **命名规范**：组件名称使用大写字母和下划线
+5. **位置计算**：`NEXT_GROUP_POS` 影响组件的布局排列
+6. **数据类型匹配**：确保 CONTROL_DATA_TYPE 与控件类型匹配
+7. **默认值范围**：确保默认值在控件的有效范围内
+8. **颜色格式**：颜色值必须使用十六进制格式
+9. **字体设置**：字体大小范围通常为8-72，字体颜色使用十六进制格式（仅适用于控件组件段，硬件仿真组件段使用系统默认样式）
+10. **字体默认值**：当控件未定义 CONTROL_FONT_SIZE、CONTROL_FONT_COLOR 或 CONTROL_FONT_NAME 时，使用 `[WINDOW]` 段的 `FONT_SIZE`、`FONT_COLOR` 和 `FONT_NAME` 作为默认值
+11. **文件扩展名**：文件操作按钮需要指定正确的文件扩展名
+12. **注释格式**：支持 `//` 和 `;` 两种注释格式
+
+## 验证规则
+
+生成配置文件后，应验证以下内容：
+1. 如果存在 `[WINDOW]` 段，验证其参数格式正确
+2. 如果存在 `[GROUP]` 段，验证所有声明的硬件仿真组件和控件组件都有对应的配置段，且组件名称格式正确（大写字母和下划线）
+3. 验证所有控件组件的 `CONTROL_NAME` 数组长度与 `CONTROL_TYPE` 数组长度一致
+4. 验证 `CONTROL_DATA_TYPE` 与对应的控件类型匹配（数值类型用0，字符串类型用1）
+5. 验证颜色值格式正确（十六进制格式，如0x000000）
+6. 验证字体大小在有效范围内（8-300）
+7. 验证 `NEXT_GROUP_POS` 值在有效范围内（0、1、2）
+8. 验证 `CONTROL_DEFAULT_VALUE` 与控件类型和数据类型匹配
+9. 验证特殊控件（如COMBO、FILE、CHART）的额外参数配置正确
+10. 验证数组参数格式正确（大括号包围，逗号分隔）

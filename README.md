@@ -141,13 +141,12 @@ WindowsÄ£ÄâÆ÷ÊÇNOS SDKµÄºËĞÄ×é¼şÖ®Ò»£¬ÎªÇ¶ÈëÊ½¿ª·¢Ìá¹©ÁËÍêÕûµÄMCU·ÂÕæ»·¾³¡£ËüÖ÷Ò
 3. **Éú³ÉÏîÄ¿ÎÄ¼ş**
    ```bash
    cd platform/win32/nos_simu
-   cmake ..
+   cmake .
    ```
 
 4. **±àÒëÏîÄ¿**
    ```bash
    cmake --build . --config Debug
-   copy ui.ini Debug/
    ```
 
 5. **ÔËĞĞ³ÌĞò**

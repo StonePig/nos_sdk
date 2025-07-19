@@ -464,3 +464,4 @@ SHOW_HEX=1
 8. 验证 `CONTROL_DEFAULT_VALUE` 与控件类型和数据类型匹配
 9. 验证特殊控件（如COMBO、FILE、CHART）的额外参数配置正确
 10. 验证数组参数格式正确（大括号包围，逗号分隔）
+11. ui.ini文件编码格式为utf-8
